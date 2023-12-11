@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <link type="text/css" href="css/style.css" />
+</head>
+<body>
+    <h1>Chat</h1>
+    <input type="text" id="username" placeholder="Username of the person" required>
+    <button id="checkUserButton">Check User</button>
+    <div id="chatWindow" style="display: none;">
+        <div id="messages"></div>
+        <form id="messageForm">
+            <input type="text" id="body" placeholder="Type a message" required>
+            <button type="submit">Send</button>
+        </form>
+    </div>
+    <script>
+        const socket = io();
+
+        document.getElementById('checkUserButton').addEventListener('click', () => {
+            const username = document.getElementById('username').value;
+            socket.emit('checkUser', username);
+        });
+
+        socket.on('userValid', (isValid) => {
+            if (isValid) {
+                document.getElementById('username').style.display = 'none';
+                document.getElementById('checkUserButton').style.display = 'none';
+                document.getElementById('chatWindow').style.display = 'block';
+
+                setInterval(() => {
+                    const recipient = document.getElementById('username').value;
+                    socket.emit('getMessages', { recipient });
+                }, 5000);
+            } else {
+                alert('User does not exist');
+            }
+        });
+
+        document.getElementById('messageForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const recipient = document.getElementById('username').value;
+            const body = document.getElementById('body').value;
+            socket.emit('sendMessage', { recipient, body });
+        });
+
+        socket.on('message', (data) => {
+            document.getElementById('messages').innerHTML += `<p>${data.message}</p>`;
+        });
+
+        document.getElementById('username').addEventListener('change', () => {
+            const recipient = document.getElementById('username').value;
+            socket.emit('getMessages', { recipient });
+        });
+
+        socket.on('messages', (messages) => {
+            document.getElementById('messages').innerHTML = '';
+            messages.forEach((message) => {
+                document.getElementById('messages').innerHTML += `<p>${message.sender}: ${message.body}</p>`;
+            });
+        });
+
+
+        socket.on('error', (data) => {
+            alert(data.error);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+body {
+    font-family: Arial, sans-serif;
+}
+#chatWindow {
+    display: none;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-top: 10px;
+}
+#messages {
+    height: 200px;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+    padding: 5px;
+    overflow-y: scroll;
+}
+#messageForm {
+    display: flex;
+    justify-content: space-between;
+}
+#body {
+    flex-grow: 1;
+    margin-right: 10px;
+}
